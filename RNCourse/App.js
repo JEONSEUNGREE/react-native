@@ -1,66 +1,57 @@
-import { StyleSheet, View, FlatList, Button } from 'react-native';
-import React, { useState } from 'react';
-import GoalItem from './components/GoalItem';
-import GoalInput from './components/GoalInput';
-import { StatusBar } from 'expo-status-bar'
+import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
+import StartGameScreen from './screens/StartGameScreen';
+import GameScreen from './screens/GameScreen';
+import GameOverScreen from './screens/GameOverScreen';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useState } from 'react';
+import Colors from './constants/Colors';
 
 export default function App() {
+  const [userNumber, setUserNumber] = useState('');
+  const [gameIsOver, setGameIsOver] = useState(false);
 
-  const [courseGoals, setCourseGoals] = useState([]);
-
-  const [modalIsVisible, setModalIsVisible] = useState(false);
-
-  function addGoalHandler(enteredGoalText){
-    console.log(enteredGoalText)
-    setCourseGoals((currentCourseGoals) => [...courseGoals, {text: enteredGoalText, id: Math.random().toString()}]);
-  }; 
-
-  function deleteGoalHandler(id){
-    setCourseGoals(currentCourseGoals => {
-      return currentCourseGoals.filter((item) => item.id !== id);
-    })
+  function pickedNumberHandler(pickedNumber){
+    setUserNumber(pickedNumber);
   }
 
-  function startAddGoalHandler(){
-    setModalIsVisible(true);
+  function gameOverHandler(){
+    setGameIsOver(true);
   }
 
-  function endAddGoalHandler(){
-    setModalIsVisible(false);
+  let screen = <StartGameScreen onPickNumber={pickedNumberHandler}/>;
+
+  if (userNumber) {
+    screen = <GameScreen userNumber={userNumber} onGameOverHandler={gameOverHandler}/>
+  }
+
+  if(gameIsOver){
+    screen = <GameOverScreen />
   }
 
   return (
-    <>
-    <StatusBar style='light'/>
-    <View style={styles.appContainer}>
-      <Button 
-        title='Add New Goal' 
-        color="#a065ec" 
-        onPress={startAddGoalHandler}
-      />
-      <GoalInput visible={modalIsVisible} addGoalHandler={addGoalHandler} endAddGoalHandler={endAddGoalHandler}/>
-        <View style={styles.goalsContainer}>
-        {/* ScrollView는 모든 목록을 불러와서 렌더링하기때문에 성능이슈 발생 
-        사용범위는 제한된 목록뷰에 적용에 알맞음 */}
-        <FlatList data={courseGoals} 
-        renderItem={itemData => {
-          return (
-            <GoalItem text={itemData.item.text} id={itemData.item.id} onDeleteItem={deleteGoalHandler} />
-          );
-        }} alwaysBounceVertical={false} />
-      </View>
-    </View>
-    </>
+      <LinearGradient 
+        colors={[Colors.primary700, Colors.accent500]} 
+        style={styles.rootScreen}
+      >
+        <ImageBackground 
+          source={require('./assets/images/background.png')} 
+          resizeMode='cover'
+          style={styles.rootScreen}
+          imageStyle={styles.backgroundImage}
+          >
+          <SafeAreaView style={styles.rootScreen}>
+            {screen}
+          </SafeAreaView>
+        </ImageBackground>
+      </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  appContainer: {
+  rootScreen: {
     flex: 1,
-    marginTop: 50,
-    margin: 20
   },
-  goalsContainer: {
-    flex: 3
+  backgroundImage: {
+    opacity: 0.15
   }
 });
