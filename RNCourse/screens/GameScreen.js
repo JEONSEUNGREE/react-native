@@ -58,6 +58,7 @@ function GameScreen({userNumber, onGameOverHandler}) {
     const newRndNumber = generateRandomBetween(minBoundary, maxBoundary, currentGuess)
     setCurrentGuess(newRndNumber);
   }
+
   return (
     <View style={styles.screen}>
        <AntDesign name="rightcircle" size={24} color="black" />
